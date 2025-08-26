@@ -2,24 +2,23 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>2048 Game</title>
-  <link rel="stylesheet" href="style.css" />
+  <link rel="stylesheet" href="style.css"/>
 </head>
 <body>
   <div class="header">
     <h1>2048</h1>
-    <button id="new-game">New Game</button>
+    <div class="score-container">
+      <div id="score">0</div>
+      <button id="newGame">New Game</button>
+    </div>
   </div>
 
-  <div class="scores">
-    <div class="score">Score <span id="score">0</span></div>
-    <div class="score">Best <span id="best">0</span></div>
+  <div class="game-container">
+    <div class="grid"></div>
+    <div class="tiles"></div>
   </div>
-
-  <div id="board"></div>
-
-  <p class="info">Use arrow keys or swipe</p>
 
   <script src="script.js"></script>
 </body>
