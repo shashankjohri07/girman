@@ -1,100 +1,125 @@
-const gridSize = 4;
-let board = [];
+// Board setup
+let board = Array.from({ length: 4 }, () => Array(4).fill(0));
 let score = 0;
+let bestScore = parseInt(localStorage.getItem("bestScore")) || 0;
 
-const tilesLayer = document.querySelector(".tiles");
-const scoreEl = document.getElementById("score");
-const newGameBtn = document.getElementById("newGame");
+// Utility: get random empty cell
+function randomEmptyCell() {
+  const empty = [];
+  board.forEach((row, r) =>
+    row.forEach((val, c) => {
+      if (val === 0) empty.push([r, c]);
+    })
+  );
+  return empty[Math.floor(Math.random() * empty.length)];
+}
 
-function init() {
-  board = Array.from({ length: gridSize }, () => Array(gridSize).fill(0));
+// Add new tile (2 or 4)
+function addTile() {
+  const cell = randomEmptyCell();
+  if (cell) board[cell[0]][cell[1]] = Math.random() < 0.9 ? 2 : 4;
+}
+
+// Reset game
+function newGame() {
+  board = Array.from({ length: 4 }, () => Array(4).fill(0));
   score = 0;
-  scoreEl.textContent = score;
-  tilesLayer.innerHTML = "";
-  addRandomTile();
-  addRandomTile();
+  addTile();
+  addTile();
   render();
 }
 
-function addRandomTile() {
-  let empty = [];
-  for (let r = 0; r < gridSize; r++) {
-    for (let c = 0; c < gridSize; c++) {
-      if (board[r][c] === 0) empty.push({ r, c });
-    }
-  }
-  if (!empty.length) return;
-  let { r, c } = empty[Math.floor(Math.random() * empty.length)];
-  board[r][c] = Math.random() < 0.9 ? 2 : 4;
+// Tile color classes
+function getTileClass(value) {
+  const colors = {
+    2: "bg-yellow-100 text-gray-800",
+    4: "bg-yellow-200 text-gray-800",
+    8: "bg-orange-400 text-white",
+    16: "bg-orange-500 text-white",
+    32: "bg-orange-600 text-white",
+    64: "bg-red-500 text-white",
+    128: "bg-green-400 text-white text-lg",
+    256: "bg-green-500 text-white text-lg",
+    512: "bg-green-600 text-white text-lg",
+    1024: "bg-blue-500 text-white text-xl",
+    2048: "bg-purple-600 text-white text-xl font-bold",
+  };
+  return colors[value] || "bg-black text-white";
 }
 
+// Render board
 function render() {
-  tilesLayer.innerHTML = "";
-  for (let r = 0; r < gridSize; r++) {
-    for (let c = 0; c < gridSize; c++) {
-      let value = board[r][c];
-      if (value) {
+  const container = document.getElementById("game-board");
+  container.innerHTML = "";
+
+  board.forEach((row, r) =>
+    row.forEach((val, c) => {
+      if (val !== 0) {
         const tile = document.createElement("div");
-        tile.className = `tile tile-${value}`;
-        tile.textContent = value;
-        tile.style.top = `${r * 120}px`;
-        tile.style.left = `${c * 120}px`;
-        tilesLayer.appendChild(tile);
+        tile.className =
+          `absolute flex items-center justify-center w-[110px] h-[110px] rounded-lg font-bold transition-transform duration-200 ${getTileClass(val)}`;
+        tile.style.transform = `translate(${c * 121}px, ${r * 121}px)`;
+        tile.textContent = val;
+        container.appendChild(tile);
       }
-    }
-  }
-  scoreEl.textContent = score;
+    })
+  );
+
+  document.getElementById("current-score").textContent = score;
+  document.getElementById("best-score").textContent = bestScore;
 }
 
+// Move + Merge
+function slide(row) {
+  let arr = row.filter(v => v !== 0);
+  for (let i = 0; i < arr.length - 1; i++) {
+    if (arr[i] === arr[i + 1]) {
+      arr[i] *= 2;
+      score += arr[i];
+      arr[i + 1] = 0;
+    }
+  }
+  arr = arr.filter(v => v !== 0);
+  while (arr.length < 4) arr.push(0);
+  return arr;
+}
+
+function rotateClockwise() {
+  board = board[0].map((_, i) => board.map(row => row[i]).reverse());
+}
+
+function rotateCounterClockwise() {
+  board = board[0].map((_, i) => board.map(row => row[3 - i]));
+}
+
+// Move board in direction
 function move(direction) {
-  let rotated = false, flipped = false;
+  let oldBoard = JSON.stringify(board);
 
-  if (direction === "up") { board = rotateLeft(board); }
-  if (direction === "down") { board = rotateRight(board); }
-  if (direction === "right") { board = board.map(row => row.reverse()); flipped = true; }
+  for (let i = 0; i < direction; i++) rotateClockwise();
+  board = board.map(row => slide(row));
+  for (let i = 0; i < (4 - direction) % 4; i++) rotateClockwise();
 
-  let moved = false;
-  let newBoard = board.map(row => {
-    let arr = row.filter(v => v);
-    for (let i = 0; i < arr.length - 1; i++) {
-      if (arr[i] === arr[i + 1]) {
-        arr[i] *= 2;
-        score += arr[i];
-        arr[i + 1] = 0;
-      }
+  if (JSON.stringify(board) !== oldBoard) {
+    addTile();
+    if (score > bestScore) {
+      bestScore = score;
+      localStorage.setItem("bestScore", bestScore);
     }
-    arr = arr.filter(v => v);
-    while (arr.length < gridSize) arr.push(0);
-    if (arr.toString() !== row.toString()) moved = true;
-    return arr;
-  });
-
-  if (flipped) newBoard = newBoard.map(row => row.reverse());
-  if (direction === "up") newBoard = rotateRight(newBoard);
-  if (direction === "down") newBoard = rotateLeft(newBoard);
-
-  if (moved) {
-    board = newBoard;
-    addRandomTile();
-    render();
   }
+  render();
 }
 
-function rotateLeft(m) {
-  return m[0].map((_, i) => m.map(row => row[gridSize - 1 - i]));
-}
-
-function rotateRight(m) {
-  return m[0].map((_, i) => m.map(row => row[i]).reverse());
-}
-
+// Key Controls
 document.addEventListener("keydown", e => {
-  if (e.key === "ArrowLeft") move("left");
-  if (e.key === "ArrowRight") move("right");
-  if (e.key === "ArrowUp") move("up");
-  if (e.key === "ArrowDown") move("down");
+  if (e.key === "ArrowLeft") move(0);
+  if (e.key === "ArrowUp") move(1);
+  if (e.key === "ArrowRight") move(2);
+  if (e.key === "ArrowDown") move(3);
 });
 
-newGameBtn.addEventListener("click", init);
+// New game button
+document.getElementById("new-game").addEventListener("click", newGame);
 
-init();
+// Init
+newGame();
