@@ -116,13 +116,19 @@ function makeMove(dir) {
 // keys (fixed UP/DOWN mapping)
 document.addEventListener("keydown", e => {
   if (e.key === "ArrowLeft") makeMove(0);
-  if (e.key === "ArrowUp") makeMove(3);   // fixed
+  if (e.key === "ArrowUp") makeMove(3);   
   if (e.key === "ArrowRight") makeMove(2);
-  if (e.key === "ArrowDown") makeMove(1); // fixed
+  if (e.key === "ArrowDown") makeMove(1); 
 });
 
 // reset btn
 document.getElementById("new-game").addEventListener("click", startGame);
+
+// --- NEW: Button clicks for moves ---
+document.getElementById("btn-left").addEventListener("click", () => makeMove(0));
+document.getElementById("btn-up").addEventListener("click", () => makeMove(3));
+document.getElementById("btn-right").addEventListener("click", () => makeMove(2));
+document.getElementById("btn-down").addEventListener("click", () => makeMove(1));
 
 // init
 startGame();
