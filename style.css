@@ -12,9 +12,20 @@ body {
   align-items: center;
 }
 
+button {
+  background: #8f7a66;
+  border: none;
+  color: white;
+  padding: 10px 20px;
+  border-radius: 6px;
+  cursor: pointer;
+}
+
 .scores {
   display: flex;
+  justify-content: center;
   gap: 10px;
+  margin: 15px 0;
 }
 
 .score {
@@ -23,20 +34,6 @@ body {
   border-radius: 6px;
   color: #fff;
   font-weight: bold;
-}
-
-.buttons {
-  margin: 15px 0;
-}
-
-button {
-  background: #8f7a66;
-  border: none;
-  color: white;
-  padding: 10px 20px;
-  margin: 0 5px;
-  border-radius: 6px;
-  cursor: pointer;
 }
 
 #board {
@@ -72,3 +69,7 @@ button {
 .value-512 { background: #edc850; color: #fff; font-size: 20px; }
 .value-1024 { background: #edc53f; color: #fff; font-size: 18px; }
 .value-2048 { background: #edc22e; color: #fff; font-size: 18px; }
+
+.info {
+  margin-top: 10px;
+}
