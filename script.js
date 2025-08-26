@@ -114,9 +114,9 @@ function makeMove(dir) {
 // keys
 document.addEventListener("keydown", e => {
   if (e.key === "ArrowLeft") makeMove(0);
-  if (e.key === "ArrowUp") makeMove(1);
+  if (e.key === "ArrowUp") makeMove(3);   // 🔄 was 1
   if (e.key === "ArrowRight") makeMove(2);
-  if (e.key === "ArrowDown") makeMove(3);
+  if (e.key === "ArrowDown") makeMove(1); // 🔄 was 3
 });
 
 // reset btn
