@@ -1,37 +1,37 @@
-// Board setup
-let board = Array.from({ length: 4 }, () => Array(4).fill(0));
-let score = 0;
-let bestScore = parseInt(localStorage.getItem("bestScore")) || 0;
+// basic board + scores
+let gameGrid = Array.from({ length: 4 }, () => Array(4).fill(0));
+let currentPoints = 0;
+let topPoints = parseInt(localStorage.getItem("topPoints")) || 0;
 
-// Utility: get random empty cell
-function randomEmptyCell() {
-  const empty = [];
-  board.forEach((row, r) =>
-    row.forEach((val, c) => {
-      if (val === 0) empty.push([r, c]);
+// pick a random khali cell
+function pickEmptySpot() {
+  const spaces = [];
+  gameGrid.forEach((row, rowIdx) =>
+    row.forEach((val, colIdx) => {
+      if (val === 0) spaces.push([rowIdx, colIdx]);
     })
   );
-  return empty[Math.floor(Math.random() * empty.length)];
+  return spaces[Math.floor(Math.random() * spaces.length)];
 }
 
-// Add new tile (2 or 4)
-function addTile() {
-  const cell = randomEmptyCell();
-  if (cell) board[cell[0]][cell[1]] = Math.random() < 0.9 ? 2 : 4;
+// add new number (2 or kabhi kabhi 4)
+function dropNewNumber() {
+  const pos = pickEmptySpot();
+  if (pos) gameGrid[pos[0]][pos[1]] = Math.random() < 0.9 ? 2 : 4;
 }
 
-// Reset game
-function newGame() {
-  board = Array.from({ length: 4 }, () => Array(4).fill(0));
-  score = 0;
-  addTile();
-  addTile();
-  render();
+// start/reset game
+function startGame() {
+  gameGrid = Array.from({ length: 4 }, () => Array(4).fill(0));
+  currentPoints = 0;
+  dropNewNumber();
+  dropNewNumber();
+  drawGrid();
 }
 
-// Tile color classes
-function getTileClass(value) {
-  const colors = {
+// tile colors
+function tileColor(val) {
+  const shades = {
     2: "bg-yellow-100 text-gray-800",
     4: "bg-yellow-200 text-gray-800",
     8: "bg-orange-400 text-white",
@@ -44,38 +44,38 @@ function getTileClass(value) {
     1024: "bg-blue-500 text-white text-xl",
     2048: "bg-purple-600 text-white text-xl font-bold",
   };
-  return colors[value] || "bg-black text-white";
+  return shades[val] || "bg-black text-white";
 }
 
-// Render board
-function render() {
-  const container = document.getElementById("game-board");
-  container.innerHTML = "";
+// render full board
+function drawGrid() {
+  const wrap = document.getElementById("game-board");
+  wrap.innerHTML = "";
 
-  board.forEach((row, r) =>
+  gameGrid.forEach((row, r) =>
     row.forEach((val, c) => {
       if (val !== 0) {
-        const tile = document.createElement("div");
-        tile.className =
-          `absolute flex items-center justify-center w-[110px] h-[110px] rounded-lg font-bold transition-transform duration-200 ${getTileClass(val)}`;
-        tile.style.transform = `translate(${c * 121}px, ${r * 121}px)`;
-        tile.textContent = val;
-        container.appendChild(tile);
+        const box = document.createElement("div");
+        box.className =
+          `absolute flex items-center justify-center w-[110px] h-[110px] rounded-lg font-bold transition-transform duration-200 ${tileColor(val)}`;
+        box.style.transform = `translate(${c * 121}px, ${r * 121}px)`;
+        box.textContent = val;
+        wrap.appendChild(box);
       }
     })
   );
 
-  document.getElementById("current-score").textContent = score;
-  document.getElementById("best-score").textContent = bestScore;
+  document.getElementById("current-score").textContent = currentPoints;
+  document.getElementById("best-score").textContent = topPoints;
 }
 
-// Move + Merge
-function slide(row) {
+// merge row logic
+function squishRow(row) {
   let arr = row.filter(v => v !== 0);
   for (let i = 0; i < arr.length - 1; i++) {
     if (arr[i] === arr[i + 1]) {
       arr[i] *= 2;
-      score += arr[i];
+      currentPoints += arr[i];
       arr[i + 1] = 0;
     }
   }
@@ -84,42 +84,43 @@ function slide(row) {
   return arr;
 }
 
-function rotateClockwise() {
-  board = board[0].map((_, i) => board.map(row => row[i]).reverse());
+// rotate helpers
+function turnRight() {
+  gameGrid = gameGrid[0].map((_, i) => gameGrid.map(row => row[i]).reverse());
 }
 
-function rotateCounterClockwise() {
-  board = board[0].map((_, i) => board.map(row => row[3 - i]));
+function turnLeft() {
+  gameGrid = gameGrid[0].map((_, i) => gameGrid.map(row => row[3 - i]));
 }
 
-// Move board in direction
-function move(direction) {
-  let oldBoard = JSON.stringify(board);
+// move grid
+function makeMove(dir) {
+  let prev = JSON.stringify(gameGrid);
 
-  for (let i = 0; i < direction; i++) rotateClockwise();
-  board = board.map(row => slide(row));
-  for (let i = 0; i < (4 - direction) % 4; i++) rotateClockwise();
+  for (let i = 0; i < dir; i++) turnRight();
+  gameGrid = gameGrid.map(r => squishRow(r));
+  for (let i = 0; i < (4 - dir) % 4; i++) turnRight();
 
-  if (JSON.stringify(board) !== oldBoard) {
-    addTile();
-    if (score > bestScore) {
-      bestScore = score;
-      localStorage.setItem("bestScore", bestScore);
+  if (JSON.stringify(gameGrid) !== prev) {
+    dropNewNumber();
+    if (currentPoints > topPoints) {
+      topPoints = currentPoints;
+      localStorage.setItem("topPoints", topPoints);
     }
   }
-  render();
+  drawGrid();
 }
 
-// Key Controls
+// keys
 document.addEventListener("keydown", e => {
-  if (e.key === "ArrowLeft") move(0);
-  if (e.key === "ArrowUp") move(1);
-  if (e.key === "ArrowRight") move(2);
-  if (e.key === "ArrowDown") move(3);
+  if (e.key === "ArrowLeft") makeMove(0);
+  if (e.key === "ArrowUp") makeMove(1);
+  if (e.key === "ArrowRight") makeMove(2);
+  if (e.key === "ArrowDown") makeMove(3);
 });
 
-// New game button
-document.getElementById("new-game").addEventListener("click", newGame);
+// reset btn
+document.getElementById("new-game").addEventListener("click", startGame);
 
-// Init
-newGame();
+// init
+startGame();
