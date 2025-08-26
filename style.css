@@ -1,89 +1,88 @@
+/* basic page styling */
 body {
+  margin:0;
+  padding:20px;
   font-family: Arial, sans-serif;
-  background: #faf8ef;
-  text-align: center;
-  margin: 0;
-  padding: 20px;
+  background-color:#faf8ef;
+  text-align:center;
 }
 
+/* header bar */
 .header {
-  display: flex;
+  margin: 0 auto;
+  max-width:500px;
+  display:flex;
+  align-items:center;
   justify-content: space-between;
-  align-items: center;
-  max-width: 500px;
-  margin: auto;
 }
 
 .score-container {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
+  display:flex;
+  flex-direction:column;
+  align-items:center
 }
 
 button {
-  background: #8f7a66;
-  color: white;
-  border: none;
-  padding: 5px 12px;
-  border-radius: 4px;
-  cursor: pointer;
-  margin-top: 5px;
+  background:#8f7a66;
+  color:#fff;
+  border:none;
+  padding:6px 12px;
+  cursor:pointer;
+  margin-top:6px;
+  border-radius:4px
 }
 
 .game-container {
+  width:500px;
+  height:500px;
+  margin:20px auto;
+  padding:10px;
+  background:#bbada0;
+  border-radius:6px;
+  box-sizing:border-box;
   position: relative;
-  width: 500px;
-  height: 500px;
-  margin: 20px auto;
-  background: #bbada0;
-  border-radius: 6px;
-  padding: 10px;
-  box-sizing: border-box;
 }
 
 .grid {
-  width: 100%;
-  height: 100%;
-  display: grid;
-  grid-template-columns: repeat(4, 1fr);
-  grid-template-rows: repeat(4, 1fr);
-  gap: 10px;
+  display:grid;
+  grid-template-columns: repeat(4,1fr);
+  grid-template-rows:repeat(4,1fr);
+  width:100%;
+  height:100%;
+  gap:10px;
 }
 
 .grid div {
-  background: #cdc1b4;
-  border-radius: 4px;
+  background:#cdc1b4;
+  border-radius:4px
 }
 
+/* actual tiles layer */
 .tiles {
-  position: absolute;
-  top: 10px;
-  left: 10px;
-  right: 10px;
-  bottom: 10px;
+  position:absolute;
+  top:10px; bottom:10px;
+  left:10px; right:10px
 }
 
 .tile {
-  position: absolute;
-  width: 110px;
-  height: 110px;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  font-size: 32px;
-  font-weight: bold;
-  border-radius: 6px;
-  transition: top 0.15s ease, left 0.15s ease;
+  position:absolute;
+  width:110px; height:110px;
+  display:flex; align-items:center; justify-content:center;
+  font-weight:bold;
+  font-size:32px;
+  border-radius:6px;
+  transition: top .15s ease, left .15s ease;
 }
 
-.tile-2 { background: #eee4da; color: #776e65; }
-.tile-4 { background: #ede0c8; color: #776e65; }
-.tile-8 { background: #f2b179; color: #f9f6f2; }
-.tile-16 { background: #f59563; color: #f9f6f2; }
-.tile-32 { background: #f67c5f; color: #f9f6f2; }
-.tile-64 { background: #f65e3b; color: #f9f6f2; }
-.tile-128 { background: #edcf72; color: #f9f6f2; }
-.tile-256 { background: #edcc61; color: #f9f6f2; }
-.tile-512 { background: #edc850; color: #f9f6f2; }
-.tile-1024 { background: #edc53f; color: #f9f6f2; }
-.tile-2048 { background: #edc22e; color: #f9f6f2; }
+/* tile shades */
+.tile-2    {background:#eee4da; color:#776e65}
+.tile-4    { background:#ede0c8; color:#776e65; }
+.tile-8 {background:#f2b179; color:#f9f6f2;}
+.tile-16 {background:#f59563;color:#f9f6f2}
+.tile-32{ background:#f67c5f; color:#f9f6f2 }
+.tile-64{background:#f65e3b;color:#f9f6f2}
+.tile-128{ background:#edcf72; color:#f9f6f2; }
+.tile-256 { background:#edcc61;color:#f9f6f2 }
+.tile-512 {background:#edc850;color:#f9f6f2}
+.tile-1024 { background:#edc53f; color:#f9f6f2 }
+.tile-2048{background:#edc22e;color:#f9f6f2;}
