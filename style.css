@@ -1,74 +1,74 @@
-:root{
-  --bg:#faf8ef;
-  --board:#bbada0;
-  --cell:#cdc1b4;
-  --font: Inter, "Segoe UI", Roboto, Arial, sans-serif;
-}
-*{box-sizing:border-box}
-html,body{height:100%;margin:0;font-family:var(--font);background:var(--bg)}
-.app{min-height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:20px}
-.header{width:100%;max-width:460px;display:flex;justify-content:space-between;align-items:center;margin-bottom:12px}
-.title{margin:0;color:#776e65;font-size:34px}
-.scores{display:flex;gap:10px;align-items:center}
-.score{background:#bbada0;color:#fff;padding:8px 12px;border-radius:6px;font-weight:700}
-.controls{width:100%;max-width:460px;display:flex;gap:10px;align-items:center;margin-bottom:12px}
-.btn{background:#8f7a66;color:#fff;border:0;padding:8px 12px;border-radius:6px;cursor:pointer}
-.hint{color:#776e65;font-size:13px;margin-left:auto}
-
-.board{width:100%;max-width:460px;background:var(--board);padding:14px;border-radius:6px;position:relative;overflow:hidden}
-.grid{display:grid;grid-template-columns:repeat(4,1fr);gap:12px}
-.cell{background:var(--cell);border-radius:6px;padding-top:100%;position:relative} /* square by padding hack */
-
-/* tile layer sits above the grid */
-.tiles{position:absolute;left:14px;top:14px;right:14px;bottom:14px;pointer-events:none}
-
-/* each tile is absolutely positioned inside .tiles */
-.tile{
-  position:absolute;
-  border-radius:6px;
-  display:flex;
-  align-items:center;
-  justify-content:center;
-  font-weight:800;
-  color:#fff;
-  transform-origin:center center;
-  transition:
-    transform 160ms ease,
-    left 160ms ease,
-    top 160ms ease,
-    width 160ms ease,
-    height 160ms ease,
-    opacity 160ms ease;
-  will-change: transform, left, top;
-  box-shadow: 0 2px 0 rgba(0,0,0,0.15) inset;
+body {
+  font-family: Arial, sans-serif;
+  background: #faf8ef;
+  color: #776e65;
+  text-align: center;
+  margin: 20px;
 }
 
-/* 'pop' animation for new/merged tiles */
-.tile.pop{ animation: pop .12s ease-out }
-@keyframes pop { from{ transform: scale(.2) } to{ transform: scale(1) } }
-
-/* tile colors */
-.tile.n2{background:#eee4da;color:#776e65}
-.tile.n4{background:#ede0c8;color:#776e65}
-.tile.n8{background:#f2b179}
-.tile.n16{background:#f59563}
-.tile.n32{background:#f67c5f}
-.tile.n64{background:#f65e3b}
-.tile.n128{background:#edcf72;color:#f9f6f2;font-size:20px}
-.tile.n256{background:#edcc61;color:#f9f6f2;font-size:20px}
-.tile.n512{background:#edc850;color:#f9f6f2;font-size:18px}
-.tile.n1024{background:#edc53f;color:#f9f6f2;font-size:16px}
-.tile.n2048{background:#edc22e;color:#f9f6f2;font-size:16px}
-
-/* overlay */
-.overlay{position:absolute;inset:0;background:rgba(238,228,218,0.6);display:flex;align-items:center;justify-content:center;flex-direction:column;z-index:10;border-radius:6px}
-.overlay p{font-size:22px;color:#776e65;margin:0 0 10px}
-.overlay .btn{pointer-events:auto}
-
-/* footer */
-.footer{max-width:460px;text-align:center;color:#8f7a66;margin-top:12px;font-size:13px}
-
-/* responsive */
-@media (max-width:520px){
-  .header, .controls, .board, .footer { max-width:94vw }
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
 }
+
+.scores {
+  display: flex;
+  gap: 10px;
+}
+
+.score {
+  background: #bbada0;
+  padding: 10px 20px;
+  border-radius: 6px;
+  color: #fff;
+  font-weight: bold;
+}
+
+.buttons {
+  margin: 15px 0;
+}
+
+button {
+  background: #8f7a66;
+  border: none;
+  color: white;
+  padding: 10px 20px;
+  margin: 0 5px;
+  border-radius: 6px;
+  cursor: pointer;
+}
+
+#board {
+  display: grid;
+  grid-template-columns: repeat(4, 80px);
+  grid-template-rows: repeat(4, 80px);
+  gap: 10px;
+  justify-content: center;
+  margin: 20px auto;
+  background: #bbada0;
+  padding: 10px;
+  border-radius: 10px;
+}
+
+.tile {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: bold;
+  font-size: 24px;
+  border-radius: 6px;
+  background: #cdc1b4;
+}
+
+.value-2 { background: #eee4da; }
+.value-4 { background: #ede0c8; }
+.value-8 { background: #f2b179; color: #fff; }
+.value-16 { background: #f59563; color: #fff; }
+.value-32 { background: #f67c5f; color: #fff; }
+.value-64 { background: #f65e3b; color: #fff; }
+.value-128 { background: #edcf72; color: #fff; font-size: 20px; }
+.value-256 { background: #edcc61; color: #fff; font-size: 20px; }
+.value-512 { background: #edc850; color: #fff; font-size: 20px; }
+.value-1024 { background: #edc53f; color: #fff; font-size: 18px; }
+.value-2048 { background: #edc22e; color: #fff; font-size: 18px; }

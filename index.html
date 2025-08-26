@@ -1,35 +1,28 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>2048 — Simple 3-file Clone</title>
-  <link rel="stylesheet" href="style.css">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>2048 Game</title>
+  <link rel="stylesheet" href="style.css" />
 </head>
 <body>
-  <main class="app">
-    <header class="header">
-      <h1 class="title">2048</h1>
-      <div class="scores">
-        <div class="score">Score <span id="score">0</span></div>
-        <div class="score">Best <span id="best">0</span></div>
-      </div>
-    </header>
-
-    <section class="controls">
-      <button id="newBtn" class="btn">New Game</button>
-      <button id="undoBtn" class="btn">Undo</button>
-      <div class="hint">Use arrow keys or swipe</div>
-    </section>
-
-    <div id="game" class="board" aria-label="2048 game board">
-      <div id="grid" class="grid"></div>
-      <div id="tiles" class="tiles"></div>
-      <!-- overlay inserted here when win/lose -->
+  <div class="header">
+    <h1>2048</h1>
+    <div class="scores">
+      <div class="score">Score <span id="score">0</span></div>
+      <div class="score">Best <span id="best">0</span></div>
     </div>
+  </div>
 
-    <footer class="footer">Single-file logic split across HTML / CSS / JS — easy & readable</footer>
-  </main>
+  <div class="buttons">
+    <button id="new-game">New Game</button>
+    <button id="undo">Undo</button>
+  </div>
+
+  <div id="board"></div>
+
+  <p class="info">Use arrow keys or swipe</p>
 
   <script src="script.js"></script>
 </body>
