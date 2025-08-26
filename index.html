@@ -1,39 +1,24 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>2048 Game - Tailwind</title>
-  <script src="https://cdn.tailwindcss.com"></script>
+    <meta charset="UTF-8">
+    <title>2048</title>
+    <link rel="stylesheet" href="style.css"/>
+    <script src="app.js"></script>
 </head>
-<body class="bg-gray-900 flex flex-col items-center justify-center min-h-screen text-white">
+<body>
 
-  <!-- Header -->
-  <div class="flex justify-between items-center w-[500px] mb-4">
-    <h1 class="text-4xl font-bold">2048</h1>
-    <button id="new-game" class="bg-yellow-500 text-gray-900 font-bold px-4 py-2 rounded-lg">
-      New Game
-    </button>
-  </div>
-
-  <!-- Score & Best -->
-  <div class="flex gap-4 mb-4">
-    <div class="bg-gray-700 px-4 py-2 rounded-lg text-center">
-      <div class="text-xs uppercase">Score</div>
-      <div id="current-score" class="text-xl font-bold">0</div>
+<div class="container">
+    <div class="info">
+        <h1>2048</h1>
+        <div class="score-container">
+            <p class="score-title">score</p>
+            <h2 id="score">0</h2>
+        </div>
     </div>
-    <div class="bg-gray-700 px-4 py-2 rounded-lg text-center">
-      <div class="text-xs uppercase">Best</div>
-      <div id="best-score" class="text-xl font-bold">0</div>
-    </div>
-  </div>
+    <p id="result">Join the numbers and get to the <b>2048</b> tile!</p>
+    <div class="grid"></div>
+</div>
 
-  <!-- Game Board -->
-  <div id="game-board"
-       class="relative bg-gray-600 rounded-lg p-2 grid grid-cols-4 gap-2 w-[500px] h-[500px]">
-    <!-- Tiles rendered by JS -->
-  </div>
-
-<script src="script.js"></script>
 </body>
 </html>
