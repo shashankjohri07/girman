@@ -1,233 +1,125 @@
-document.addEventListener("DOMContentLoaded", () => {
-    const gridDisplay = document.querySelector(".grid")
-    const scoreDisplay = document.querySelector("#score")
-    const resultDisplay = document.querySelector("#result")
-    const width = 4
-    let squares = []
-    let score = 0
+// Board setup
+let board = Array.from({ length: 4 }, () => Array(4).fill(0));
+let score = 0;
+let bestScore = parseInt(localStorage.getItem("bestScore")) || 0;
 
-    // create the playing board
-    function createBoard() {
-        for (let i = 0; i < width * width; i++) {
-            const square = document.createElement("div")
-            square.innerHTML = 0
-            gridDisplay.appendChild(square)
-            squares.push(square)
-        }
-        generate()
-        generate()
+// Utility: get random empty cell
+function randomEmptyCell() {
+  const empty = [];
+  board.forEach((row, r) =>
+    row.forEach((val, c) => {
+      if (val === 0) empty.push([r, c]);
+    })
+  );
+  return empty[Math.floor(Math.random() * empty.length)];
+}
+
+// Add new tile (2 or 4)
+function addTile() {
+  const cell = randomEmptyCell();
+  if (cell) board[cell[0]][cell[1]] = Math.random() < 0.9 ? 2 : 4;
+}
+
+// Reset game
+function newGame() {
+  board = Array.from({ length: 4 }, () => Array(4).fill(0));
+  score = 0;
+  addTile();
+  addTile();
+  render();
+}
+
+// Tile color classes
+function getTileClass(value) {
+  const colors = {
+    2: "bg-yellow-100 text-gray-800",
+    4: "bg-yellow-200 text-gray-800",
+    8: "bg-orange-400 text-white",
+    16: "bg-orange-500 text-white",
+    32: "bg-orange-600 text-white",
+    64: "bg-red-500 text-white",
+    128: "bg-green-400 text-white text-lg",
+    256: "bg-green-500 text-white text-lg",
+    512: "bg-green-600 text-white text-lg",
+    1024: "bg-blue-500 text-white text-xl",
+    2048: "bg-purple-600 text-white text-xl font-bold",
+  };
+  return colors[value] || "bg-black text-white";
+}
+
+// Render board
+function render() {
+  const container = document.getElementById("game-board");
+  container.innerHTML = "";
+
+  board.forEach((row, r) =>
+    row.forEach((val, c) => {
+      if (val !== 0) {
+        const tile = document.createElement("div");
+        tile.className =
+          `absolute flex items-center justify-center w-[110px] h-[110px] rounded-lg font-bold transition-transform duration-200 ${getTileClass(val)}`;
+        tile.style.transform = `translate(${c * 121}px, ${r * 121}px)`;
+        tile.textContent = val;
+        container.appendChild(tile);
+      }
+    })
+  );
+
+  document.getElementById("current-score").textContent = score;
+  document.getElementById("best-score").textContent = bestScore;
+}
+
+// Move + Merge
+function slide(row) {
+  let arr = row.filter(v => v !== 0);
+  for (let i = 0; i < arr.length - 1; i++) {
+    if (arr[i] === arr[i + 1]) {
+      arr[i] *= 2;
+      score += arr[i];
+      arr[i + 1] = 0;
     }
-    createBoard()
+  }
+  arr = arr.filter(v => v !== 0);
+  while (arr.length < 4) arr.push(0);
+  return arr;
+}
 
-    //generate a new number
-    function generate() {
-        const randomNumber = Math.floor(Math.random() * squares.length)
-        if (squares[randomNumber].innerHTML == 0) {
-            squares[randomNumber].innerHTML = 2
-            checkForGameOver()
-        } else generate()
+function rotateClockwise() {
+  board = board[0].map((_, i) => board.map(row => row[i]).reverse());
+}
+
+function rotateCounterClockwise() {
+  board = board[0].map((_, i) => board.map(row => row[3 - i]));
+}
+
+// Move board in direction
+function move(direction) {
+  let oldBoard = JSON.stringify(board);
+
+  for (let i = 0; i < direction; i++) rotateClockwise();
+  board = board.map(row => slide(row));
+  for (let i = 0; i < (4 - direction) % 4; i++) rotateClockwise();
+
+  if (JSON.stringify(board) !== oldBoard) {
+    addTile();
+    if (score > bestScore) {
+      bestScore = score;
+      localStorage.setItem("bestScore", bestScore);
     }
+  }
+  render();
+}
 
-    function moveRight() {
-        for (let i = 0; i < 16; i++) {
-            if (i % 4 === 0) {
-                let totalOne = squares[i].innerHTML
-                let totalTwo = squares[i + 1].innerHTML
-                let totalThree = squares[i + 2].innerHTML
-                let totalFour = squares[i + 3].innerHTML
-                let row = [parseInt(totalOne), parseInt(totalTwo), parseInt(totalThree), parseInt(totalFour)]
+// Key Controls
+document.addEventListener("keydown", e => {
+  if (e.key === "ArrowLeft") move(0);
+  if (e.key === "ArrowUp") move(1);
+  if (e.key === "ArrowRight") move(2);
+  if (e.key === "ArrowDown") move(3);
+});
 
-                let filteredRow = row.filter(num => num)
-                let missing = 4 - filteredRow.length
-                let zeros = Array(missing).fill(0)
-                let newRow = zeros.concat(filteredRow)
+// New game button
+document.getElementById("new-game").addEventListener("click", newGame);
 
-                squares[i].innerHTML = newRow[0]
-                squares[i + 1].innerHTML = newRow[1]
-                squares[i + 2].innerHTML = newRow[2]
-                squares[i + 3].innerHTML = newRow[3]
-            }
-        }
-    }
-
-    function moveLeft() {
-        for (let i = 0; i < 16; i++) {
-            if (i % 4 === 0) {
-                let totalOne = squares[i].innerHTML
-                let totalTwo = squares[i + 1].innerHTML
-                let totalThree = squares[i + 2].innerHTML
-                let totalFour = squares[i + 3].innerHTML
-                let row = [parseInt(totalOne), parseInt(totalTwo), parseInt(totalThree), parseInt(totalFour)]
-
-                let filteredRow = row.filter(num => num)
-                let missing = 4 - filteredRow.length
-                let zeros = Array(missing).fill(0)
-                let newRow = filteredRow.concat(zeros)
-
-                squares[i].innerHTML = newRow[0]
-                squares[i + 1].innerHTML = newRow[1]
-                squares[i + 2].innerHTML = newRow[2]
-                squares[i + 3].innerHTML = newRow[3]
-            }
-        }
-    }
-
-    function moveUp() {
-        for (let i = 0; i < 4; i++) {
-            let totalOne = squares[i].innerHTML
-            let totalTwo = squares[i + width].innerHTML
-            let totalThree = squares[i + width * 2].innerHTML
-            let totalFour = squares[i + width * 3].innerHTML
-            let column = [parseInt(totalOne), parseInt(totalTwo), parseInt(totalThree), parseInt(totalFour)]
-
-            let filteredColumn = column.filter(num => num)
-            let missing = 4 - filteredColumn.length
-            let zeros = Array(missing).fill(0)
-            let newColumn = filteredColumn.concat(zeros)
-
-            squares[i].innerHTML = newColumn[0]
-            squares[i + width].innerHTML = newColumn[1]
-            squares[i + width * 2].innerHTML = newColumn[2]
-            squares[i + width * 3].innerHTML = newColumn[3]
-        }
-    }
-
-    function moveDown() {
-        for (let i = 0; i < 4; i++) {
-            let totalOne = squares[i].innerHTML
-            let totalTwo = squares[i + width].innerHTML
-            let totalThree = squares[i + width * 2].innerHTML
-            let totalFour = squares[i + width * 3].innerHTML
-            let column = [parseInt(totalOne), parseInt(totalTwo), parseInt(totalThree), parseInt(totalFour)]
-
-            let filteredColumn = column.filter(num => num)
-            let missing = 4 - filteredColumn.length
-            let zeros = Array(missing).fill(0)
-            let newColumn = zeros.concat(filteredColumn)
-
-            squares[i].innerHTML = newColumn[0]
-            squares[i + width].innerHTML = newColumn[1]
-            squares[i + width * 2].innerHTML = newColumn[2]
-            squares[i + width * 3].innerHTML = newColumn[3]
-        }
-    }
-
-    function combineRow() {
-        for (let i = 0; i < 15; i++) {
-            if (squares[i].innerHTML === squares[i + 1].innerHTML) {
-                let combinedTotal = parseInt(squares[i].innerHTML) + parseInt(squares[i + 1].innerHTML)
-                squares[i].innerHTML = combinedTotal
-                squares[i + 1].innerHTML = 0
-                score += combinedTotal
-                scoreDisplay.innerHTML = score
-            }
-        }
-        checkForWin()
-    }
-
-    function combineColumn() {
-        for (let i = 0; i < 12; i++) {
-            if (squares[i].innerHTML === squares[i + width].innerHTML) {
-                let combinedTotal = parseInt(squares[i].innerHTML) + parseInt(squares[i + width].innerHTML)
-                squares[i].innerHTML = combinedTotal
-                squares[i + width].innerHTML = 0
-                score += combinedTotal
-                scoreDisplay.innerHTML = score
-            }
-        }
-        checkForWin()
-    }
-
-    ///assign functions to keys
-    function control(e) {
-        if (e.key === "ArrowLeft") {
-            keyLeft()
-        } else if (e.key === "ArrowRight") {
-            keyRight()
-        } else if (e.key === "ArrowUp") {
-            keyUp()
-        } else if (e.key === "ArrowDown") {
-            keyDown()
-        }
-    }
-    document.addEventListener("keydown", control)
-
-    function keyLeft() {
-        moveLeft()
-        combineRow()
-        moveLeft()
-        generate()
-    }
-
-    function keyRight() {
-        moveRight()
-        combineRow()
-        moveRight()
-        generate()
-    }
-
-    function keyUp() {
-        moveUp()
-        combineColumn()
-        moveUp()
-        generate()
-    }
-
-    function keyDown() {
-        moveDown()
-        combineColumn()
-        moveDown()
-        generate()
-    }
-
-    //check for the number 2048 in the squares to win
-    function checkForWin() {
-        for (let i = 0; i < squares.length; i++) {
-            if (squares[i].innerHTML == 2048) {
-                resultDisplay.innerHTML = "You WIN!"
-                document.removeEventListener("keydown", control)
-                setTimeout(clear, 3000)
-            }
-        }
-    }
-
-    //check if there are no zeros on the board to lose
-    function checkForGameOver() {
-        let zeros = 0
-        for (let i = 0; i < squares.length; i++) {
-            if (squares[i].innerHTML == 0) {
-                zeros++
-            }
-        }
-        if (zeros === 0) {
-            resultDisplay.innerHTML = "You LOSE!"
-            document.removeEventListener("keydown", control)
-            setTimeout(clear, 3000)
-        }
-    }
-
-    function clear() {
-        clearInterval(myTimer)
-    }
-
-    //add colours
-    function addColours() {
-        for (let i = 0; i < squares.length; i++) {
-            if (squares[i].innerHTML == 0) squares[i].style.backgroundColor = "#afa192"
-            else if (squares[i].innerHTML == 2) squares[i].style.backgroundColor = "#eee4da"
-            else if (squares[i].innerHTML == 4) squares[i].style.backgroundColor = "#ede0c8"
-            else if (squares[i].innerHTML == 8) squares[i].style.backgroundColor = "#f2b179"
-            else if (squares[i].innerHTML == 16) squares[i].style.backgroundColor = "#ffcea4"
-            else if (squares[i].innerHTML == 32) squares[i].style.backgroundColor = "#e8c064"
-            else if (squares[i].innerHTML == 64) squares[i].style.backgroundColor = "#ffab6e"
-            else if (squares[i].innerHTML == 128) squares[i].style.backgroundColor = "#fd9982"
-            else if (squares[i].innerHTML == 256) squares[i].style.backgroundColor = "#ead79c"
-            else if (squares[i].innerHTML == 512) squares[i].style.backgroundColor = "#76daff"
-            else if (squares[i].innerHTML == 1024) squares[i].style.backgroundColor = "#beeaa5"
-            else if (squares[i].innerHTML == 2048) squares[i].style.backgroundColor = "#d7d4f0"
-        }
-    }
-    addColours()
-
-    let myTimer = setInterval(addColours, 50)
-})
+// Init
+newGame();
