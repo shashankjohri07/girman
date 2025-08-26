@@ -3,7 +3,7 @@ let gameGrid = Array.from({ length: 4 }, () => Array(4).fill(0));
 let currentPoints = 0;
 let topPoints = parseInt(localStorage.getItem("topPoints")) || 0;
 
-// pick a random khali cell
+// pick a random empty cell
 function pickEmptySpot() {
   const spaces = [];
   gameGrid.forEach((row, rowIdx) =>
@@ -47,24 +47,27 @@ function tileColor(val) {
   return shades[val] || "bg-black text-white";
 }
 
-// render full board
+// render full board with grid layout (no overlap)
 function drawGrid() {
   const wrap = document.getElementById("game-board");
   wrap.innerHTML = "";
 
-  gameGrid.forEach((row, r) =>
-    row.forEach((val, c) => {
-      if (val !== 0) {
-        const box = document.createElement("div");
-        box.className =
-          `absolute flex items-center justify-center w-[110px] h-[110px] rounded-lg font-bold transition-transform duration-200 ${tileColor(val)}`;
-        box.style.transform = `translate(${c * 121}px, ${r * 121}px)`;
-        box.textContent = val;
-        wrap.appendChild(box);
-      }
+  wrap.className = "grid grid-cols-4 gap-3 bg-gray-700 p-3 rounded-lg";
+
+  gameGrid.forEach((row) =>
+    row.forEach((val) => {
+      const cell = document.createElement("div");
+      cell.className = `
+        flex items-center justify-center 
+        w-[110px] h-[110px] rounded-lg font-bold transition-all duration-200
+        ${val === 0 ? "bg-gray-500" : tileColor(val)}
+      `;
+      if (val !== 0) cell.textContent = val;
+      wrap.appendChild(cell);
     })
   );
 
+  // scores update
   document.getElementById("current-score").textContent = currentPoints;
   document.getElementById("best-score").textContent = topPoints;
 }
@@ -88,7 +91,6 @@ function squishRow(row) {
 function turnRight() {
   gameGrid = gameGrid[0].map((_, i) => gameGrid.map(row => row[i]).reverse());
 }
-
 function turnLeft() {
   gameGrid = gameGrid[0].map((_, i) => gameGrid.map(row => row[3 - i]));
 }
@@ -111,12 +113,12 @@ function makeMove(dir) {
   drawGrid();
 }
 
-// keys
+// keys (fixed UP/DOWN mapping)
 document.addEventListener("keydown", e => {
   if (e.key === "ArrowLeft") makeMove(0);
-  if (e.key === "ArrowUp") makeMove(3);   // 🔄 was 1
+  if (e.key === "ArrowUp") makeMove(3);   // fixed
   if (e.key === "ArrowRight") makeMove(2);
-  if (e.key === "ArrowDown") makeMove(1); // 🔄 was 3
+  if (e.key === "ArrowDown") makeMove(1); // fixed
 });
 
 // reset btn
